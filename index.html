@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="randomart.js"></script>
+    <script type="text/javascript">
+function coordToIndex(x, y, w){ return (y * w * 4) + (x * 4); }
+
+function showImage(pixelsPerUnit, redExpr, greenExpr, blueExpr){
+  var image = makeImage(pixelsPerUnit, redExpr, greenExpr, blueExpr);
+  var canvasSize = image.pixbuf.length;
+
+  document.getElementById('redExpr').innerText = image.redExpr.toString();
+  document.getElementById('greenExpr').innerText = image.greenExpr.toString();
+  document.getElementById('blueExpr').innerText = image.blueExpr.toString();
+
+  var canvas = document.getElementById('canvas');
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.createImageData(canvasSize, canvasSize);
+
+  var r = 0; var g = 1; var b = 2; var a = 3;
+  for(var y = 0; y < image.pixbuf.length; y++){
+    for(var x = 0; x < image.pixbuf[y].length; x++){
+      var i = coordToIndex(x, y, imageData.width);
+      imageData.data[i+r] = image.pixbuf[y][x][r];
+      imageData.data[i+g] = image.pixbuf[y][x][g];
+      imageData.data[i+b] = image.pixbuf[y][x][b];
+      imageData.data[i+a] = 255;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function randomImage(){
+  var pixelsPerUnit = document.getElementById('pixelsPerUnit').value;
+  var redExpr = buildExpr(0.99);
+  var greenExpr = buildExpr(0.99);
+  var blueExpr = buildExpr(0.99);
+  showImage(pixelsPerUnit, redExpr, greenExpr, blueExpr);
+  document.getElementById('redExpr').innerText = (
+      "(x, y) => " + redExpr.toString());
+  document.getElementById('greenExpr').innerText = (
+      "(x, y) => " + greenExpr.toString());
+  document.getElementById('blueExpr').innerText = (
+      "(x, y) => " + blueExpr.toString());
+}
+
+window.onload = function(){
+  showImage(150, (x, y) => x, (x, y) => y, (x, y) => x * y)
+}
+
+    </script>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <div>Size: <input id="pixelsPerUnit" type="number" value="150" step="10"/></div>
+    <div><button onclick="randomImage()">Random</button></div>
+    <a href="https://jeremykun.com/2012/01/01/random-psychedelic-art/">About</a>
+    <div>redExpr = <span id="redExpr"></span></div>
+    <div>greenExpr = <span id="greenExpr"></span></div>
+    <div>blueExpr = <span id="blueExpr"></span></div>
+  </body>
+</html>
